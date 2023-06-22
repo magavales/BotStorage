@@ -14,6 +14,7 @@ func (h *Handler) InitRouter() *gin.Engine {
 		{
 			version.POST("/add", h.AddData)
 			version.GET("/get", h.GetData)
+			version.GET("/del", h.DelData)
 		}
 	}
 

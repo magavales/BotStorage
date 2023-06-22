@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -22,5 +23,8 @@ func (resp *Response) SetStatusBadRequest() {
 }
 
 func (resp *Response) SetData(data []byte) {
-	resp.rw.Header().Add("Content-Type", string(data))
+	_, err := resp.rw.Write(data)
+	if err != nil {
+		log.Println("I can't send data!")
+	}
 }

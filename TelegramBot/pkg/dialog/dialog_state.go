@@ -2,6 +2,7 @@ package dialog
 
 import (
 	"TelegramBot/pkg/model"
+	"TelegramBot/pkg/services/data_service/request"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -17,7 +18,10 @@ func (s *State) SetState(command string) {
 }
 
 func (s *State) HandlerSetStateDialog(message *tgbotapi.Message, dataService *model.DataService) string {
-	var response string
+	var (
+		response string
+		req      request.Request
+	)
 
 	switch s.Stage {
 	case Service:
@@ -30,32 +34,54 @@ func (s *State) HandlerSetStateDialog(message *tgbotapi.Message, dataService *mo
 		response = "Well done! Write your password:"
 	case Password:
 		dataService.Password = message.Text
-		response = "Nice! I save your data!"
+		if req.SetData(dataService) {
+			response = "Nice! I save your data!"
+		} else {
+			response = "I can't save your data!"
+		}
 		s.clear()
+		dataService.Clear()
 	}
 
 	return response
 }
 
 func (s *State) HandlerGetStateDialog(message *tgbotapi.Message, dataService *model.DataService) string {
-	var response string
+	var (
+		response string
+		req      request.Request
+	)
 
 	switch s.Stage {
 	case Service:
 		dataService.Service = message.Text
-		response = fmt.Sprintf("Take your data about service %s", response)
+		data, condition := req.GetData(dataService)
+		if condition {
+			response = fmt.Sprintf("Take your data about service %s.\nLogin: %s\nPassword: %s", data.Service, data.Login, data.Password)
+		} else {
+			response = fmt.Sprintf("I can't take your data about service %s.", data.Service)
+		}
+
 	}
 
 	return response
 }
 
 func (s *State) HandlerDelStateDialog(message *tgbotapi.Message, dataService *model.DataService) string {
-	var response string
+	var (
+		response string
+		req      request.Request
+	)
 
 	switch s.Stage {
 	case Service:
 		dataService.Service = message.Text
-		response = fmt.Sprintf("I delete your data about service %s", response)
+		if req.DelData(dataService) {
+			response = fmt.Sprintf("I delete your data about service %s", message.Text)
+		} else {
+			response = fmt.Sprintf("I can't delete your data about service %s", message.Text)
+		}
+
 	}
 
 	return response

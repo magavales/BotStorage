@@ -7,7 +7,7 @@ import (
 )
 
 type ServiceData struct {
-	ChatID   string `json:"chat_id"`
+	ChatID   int64 `json:"chat_id"`
 	Service  string
 	Login    string
 	Password string

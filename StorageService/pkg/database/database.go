@@ -2,39 +2,22 @@ package database
 
 import (
 	"StorageService/pkg/database/tables"
-	"github.com/jackc/pgx"
+	"context"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 )
 
 type Database struct {
-	Pool   *pgx.ConnPool
+	Pool   *pgxpool.Pool
 	Access tables.DataAccess
 }
 
 func (db *Database) Connect() {
-	config := pgx.ConnConfig{
-		Host:     "localhost",
-		Port:     5432,
-		Database: "postgres",
-		User:     "postgres",
-		Password: "1703",
-	}
-	poolConn := pgx.ConnPoolConfig{
-		ConnConfig:     config,
-		MaxConnections: 5,
-		AfterConnect:   nil,
-		AcquireTimeout: 0,
-	}
+	poolConn, _ := pgxpool.ParseConfig("user=postgres password=1703 host=localhost port=5432 dbname=postgres pool_max_conns=10")
 
 	var err error
-	db.Pool, err = pgx.NewConnPool(poolConn)
+	db.Pool, err = pgxpool.NewWithConfig(context.Background(), poolConn)
 	if err != nil {
 		log.Printf("I can't connect to database: %s\n", err)
-	}
-}
-
-func (db *Database) StatConn() {
-	if db.Pool.Stat().MaxConnections == 4 {
-		db.Pool.Close()
 	}
 }

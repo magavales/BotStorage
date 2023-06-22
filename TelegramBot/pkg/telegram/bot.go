@@ -64,6 +64,8 @@ func (tgb *TgBot) handleCommand(message *tgbotapi.Message) {
 		msg.Text = fmt.Sprintf("Well! Write name of service:")
 		state.SetState(message.Command())
 		dataService.ChatID = message.Chat.ID
+	case "secret":
+		msg.Text = fmt.Sprintf("I love thee very much, baby!❤️\nWhat about you?")
 	}
 
 	_, _ = tgb.Bot.Send(msg)
