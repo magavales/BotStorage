@@ -26,3 +26,11 @@ func (da *DataAccess) GetPwd(pool *pgx.ConnPool, data string) (model.TableData, 
 	}
 	return tableData, pgx.ErrNoRows
 }
+
+func (da *DataAccess) SetPwd(pool *pgx.ConnPool, chatID, pwd, salt string) error {
+	_, err := pool.Exec("INSERT INTO secret_pwd (password, salt, chat_id) VALUES ($1, $2, $3)", pwd, salt, chatID)
+	if err != nil {
+		return err
+	}
+	return err
+}

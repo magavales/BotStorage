@@ -1,8 +1,9 @@
 package model
 
 type TableData struct {
-	Pwd  string
-	Salt string
+	ChatID int64 `json:"chat_id"`
+	Pwd    string
+	Salt   string
 }
 
 func (td *TableData) ParseData(values []interface{}) {

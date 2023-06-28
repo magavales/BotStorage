@@ -12,9 +12,9 @@ type State struct {
 	Stage   Stage
 }
 
-func (s *State) SetState(command string) {
+func (s *State) SetState(command string, stage Stage) {
 	s.Command = command
-	s.Stage = Service
+	s.Stage = stage
 }
 
 func (s *State) HandlerSetStateDialog(message *tgbotapi.Message, dataService *model.DataService) string {
@@ -24,6 +24,24 @@ func (s *State) HandlerSetStateDialog(message *tgbotapi.Message, dataService *mo
 	)
 
 	switch s.Stage {
+	case Secret:
+		if req.SetUser(message.Chat.ID, message.Text) {
+			s.Stage = Login
+			response = fmt.Sprintf("Well! Write name of service:")
+		} else {
+			response = fmt.Sprintf("Invalid password!")
+			s.clear()
+			dataService.Clear()
+		}
+	case Verify:
+		if req.VerifyUser(message.Chat.ID, message.Text) {
+			s.Stage = Login
+			response = fmt.Sprintf("Well! Write name of service:")
+		} else {
+			response = fmt.Sprintf("Invalid password!")
+			s.clear()
+			dataService.Clear()
+		}
 	case Service:
 		dataService.Service = message.Text
 		s.Stage = Login

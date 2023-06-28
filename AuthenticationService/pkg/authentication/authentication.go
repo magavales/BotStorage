@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+var salt = "VX9XQ!psm7Qe#PbSC1#Cvup_4CI/TW7d"
+
 type Authentication struct {
 }
 
@@ -35,6 +37,25 @@ func (auth *Authentication) VerificationPassword(data string) bool {
 	} else {
 		log.Println("Password is uncorrected!")
 		return false
+	}
+}
+
+func (auth *Authentication) SetPassword(data string) bool {
+	var (
+		db       database.Database
+		chatID   string
+		password string
+	)
+	data = strings.Split(data, " ")[1]
+	chatID, password = parseData(data)
+	pwd := hex.EncodeToString(pbkdf2.Key([]byte(password), []byte(salt), 10000, 32, sha1.New))
+	db.Connect()
+	err := db.Access.SetPwd(db.Pool, chatID, pwd, salt)
+	if err != nil {
+		log.Printf("Don't found password for %s", chatID)
+		return false
+	} else {
+		return true
 	}
 }
 

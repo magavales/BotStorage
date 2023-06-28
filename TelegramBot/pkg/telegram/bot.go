@@ -3,6 +3,7 @@ package telegram
 import (
 	"TelegramBot/pkg/dialog"
 	"TelegramBot/pkg/model"
+	"TelegramBot/pkg/services/data_service/request"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
@@ -47,22 +48,31 @@ func (tgb *TgBot) RunBot(token string) {
 }
 
 func (tgb *TgBot) handleCommand(message *tgbotapi.Message) {
+	var (
+		req request.Request
+	)
 	msg := tgbotapi.NewMessage(message.Chat.ID, "")
 
 	switch message.Command() {
 	case "start":
 		msg.Text = fmt.Sprintf("Hello, %s! I'm BotStorage. I can save your login and password from anything services, if you want.", message.From.UserName)
 	case "set":
-		msg.Text = fmt.Sprintf("Well! Write name of service:")
-		state.SetState(message.Command())
+		if req.SearchUser(msg.ChatID) {
+			msg.Text = "Write your secret password:"
+			state.SetState(message.Command(), dialog.Verify)
+		} else {
+			msg.Text = "You don't have secret password, so you should set password:"
+			state.SetState(message.Command(), dialog.Secret)
+		}
+
 		dataService.ChatID = message.Chat.ID
 	case "get":
 		msg.Text = fmt.Sprintf("Well! Write name of service:")
-		state.SetState(message.Command())
+		state.SetState(message.Command(), dialog.Service)
 		dataService.ChatID = message.Chat.ID
 	case "del":
 		msg.Text = fmt.Sprintf("Well! Write name of service:")
-		state.SetState(message.Command())
+		state.SetState(message.Command(), dialog.Service)
 		dataService.ChatID = message.Chat.ID
 	case "secret":
 		msg.Text = fmt.Sprintf("I love thee very much, baby!❤️\nWhat about you?")

@@ -12,6 +12,8 @@ func (h *Handler) InitRouter() *gin.Engine {
 	{
 		version := api.Group("/v1")
 		{
+			version.POST("/set", h.SetUser)
+			version.GET("/search", h.SearchUser)
 			version.POST("/auth", h.Authentication)
 		}
 	}
