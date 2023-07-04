@@ -58,8 +58,13 @@ func (tgb *TgBot) handleCommand(message *tgbotapi.Message) {
 		msg.Text = fmt.Sprintf("Hello, %s! I'm BotStorage. I can save your login and password from anything services, if you want.", message.From.UserName)
 	case "set":
 		if req.SearchUser(msg.ChatID) {
-			msg.Text = "Write your secret password:"
-			state.SetState(message.Command(), dialog.Verify)
+			if model.GetCookie(msg.ChatID) == "" {
+				msg.Text = "Write your secret password:"
+				state.SetState(message.Command(), dialog.Verify)
+			} else {
+				msg.Text = "Well! Write name of service:"
+				state.SetState(message.Command(), dialog.Service)
+			}
 		} else {
 			msg.Text = "You don't have secret password, so you should set password:"
 			state.SetState(message.Command(), dialog.Secret)
@@ -67,12 +72,34 @@ func (tgb *TgBot) handleCommand(message *tgbotapi.Message) {
 
 		dataService.ChatID = message.Chat.ID
 	case "get":
-		msg.Text = fmt.Sprintf("Well! Write name of service:")
-		state.SetState(message.Command(), dialog.Service)
+		if req.SearchUser(msg.ChatID) {
+			if model.GetCookie(msg.ChatID) == "" {
+				msg.Text = "Write your secret password:"
+				state.SetState(message.Command(), dialog.Verify)
+			} else {
+				msg.Text = "Well! Write name of service:"
+				state.SetState(message.Command(), dialog.Service)
+			}
+		} else {
+			msg.Text = "You don't have secret password, so you should set password:"
+			state.SetState(message.Command(), dialog.Secret)
+		}
+
 		dataService.ChatID = message.Chat.ID
 	case "del":
-		msg.Text = fmt.Sprintf("Well! Write name of service:")
-		state.SetState(message.Command(), dialog.Service)
+		if req.SearchUser(msg.ChatID) {
+			if model.GetCookie(msg.ChatID) == "" {
+				msg.Text = "Write your secret password:"
+				state.SetState(message.Command(), dialog.Verify)
+			} else {
+				msg.Text = "Well! Write name of service:"
+				state.SetState(message.Command(), dialog.Service)
+			}
+		} else {
+			msg.Text = "You don't have secret password, so you should set password:"
+			state.SetState(message.Command(), dialog.Secret)
+		}
+
 		dataService.ChatID = message.Chat.ID
 	case "secret":
 		msg.Text = fmt.Sprintf("I love thee very much, baby!❤️\nWhat about you?")

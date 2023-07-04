@@ -26,7 +26,7 @@ func (s *State) HandlerSetStateDialog(message *tgbotapi.Message, dataService *mo
 	switch s.Stage {
 	case Secret:
 		if req.SetUser(message.Chat.ID, message.Text) {
-			s.Stage = Login
+			s.Stage = Service
 			response = fmt.Sprintf("Well! Write name of service:")
 		} else {
 			response = fmt.Sprintf("Invalid password!")
@@ -35,7 +35,7 @@ func (s *State) HandlerSetStateDialog(message *tgbotapi.Message, dataService *mo
 		}
 	case Verify:
 		if req.VerifyUser(message.Chat.ID, message.Text) {
-			s.Stage = Login
+			s.Stage = Service
 			response = fmt.Sprintf("Well! Write name of service:")
 		} else {
 			response = fmt.Sprintf("Invalid password!")
@@ -71,6 +71,24 @@ func (s *State) HandlerGetStateDialog(message *tgbotapi.Message, dataService *mo
 	)
 
 	switch s.Stage {
+	case Secret:
+		if req.SetUser(message.Chat.ID, message.Text) {
+			s.Stage = Service
+			response = fmt.Sprintf("Well! Write name of service:")
+		} else {
+			response = fmt.Sprintf("Invalid password!")
+			s.clear()
+			dataService.Clear()
+		}
+	case Verify:
+		if req.VerifyUser(message.Chat.ID, message.Text) {
+			s.Stage = Service
+			response = fmt.Sprintf("Well! Write name of service:")
+		} else {
+			response = fmt.Sprintf("Invalid password!")
+			s.clear()
+			dataService.Clear()
+		}
 	case Service:
 		dataService.Service = message.Text
 		data, condition := req.GetData(dataService)
@@ -92,6 +110,24 @@ func (s *State) HandlerDelStateDialog(message *tgbotapi.Message, dataService *mo
 	)
 
 	switch s.Stage {
+	case Secret:
+		if req.SetUser(message.Chat.ID, message.Text) {
+			s.Stage = Service
+			response = fmt.Sprintf("Well! Write name of service:")
+		} else {
+			response = fmt.Sprintf("Invalid password!")
+			s.clear()
+			dataService.Clear()
+		}
+	case Verify:
+		if req.VerifyUser(message.Chat.ID, message.Text) {
+			s.Stage = Service
+			response = fmt.Sprintf("Well! Write name of service:")
+		} else {
+			response = fmt.Sprintf("Invalid password!")
+			s.clear()
+			dataService.Clear()
+		}
 	case Service:
 		dataService.Service = message.Text
 		if req.DelData(dataService) {

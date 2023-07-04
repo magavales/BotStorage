@@ -6,12 +6,12 @@ import (
 	"log"
 )
 
-type Database struct {
+type PostgresDB struct {
 	Pool   *pgx.ConnPool
 	Access tables.DataAccess
 }
 
-func (db *Database) Connect() {
+func (db *PostgresDB) Connect() {
 	config := pgx.ConnConfig{
 		Host:     "localhost",
 		Port:     5432,
@@ -33,7 +33,7 @@ func (db *Database) Connect() {
 	}
 }
 
-func (db *Database) StatConn() {
+func (db *PostgresDB) StatConn() {
 	if db.Pool.Stat().MaxConnections == 4 {
 		db.Pool.Close()
 	}

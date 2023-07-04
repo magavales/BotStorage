@@ -34,3 +34,7 @@ func (da *DataAccess) SetPwd(pool *pgx.ConnPool, chatID, pwd, salt string) error
 	}
 	return err
 }
+
+func (da *DataAccess) SetCookies() {
+
+}

@@ -23,6 +23,7 @@ func (r *Request) SetData(dataService *model.DataService) bool {
 		log.Println("Invalid request!")
 	}
 	r.Request.Header.Set("Content-Type", "application/json")
+	r.Request.Header.Set("Set-Cookie", model.GetCookie(dataService.ChatID))
 	resp := r.doRequest()
 	if resp.StatusCode == http.StatusOK {
 		return true
@@ -43,6 +44,7 @@ func (r *Request) GetData(dataService *model.DataService) (model.DataService, bo
 		log.Println("Invalid request!")
 	}
 	r.Request.Header.Set("Content-Type", "application/json")
+	r.Request.Header.Set("Set-Cookie", model.GetCookie(dataService.ChatID))
 	resp.Response = r.doRequest()
 	if resp.Response.StatusCode == http.StatusOK {
 		log.Println(resp.Response.Body)
@@ -64,6 +66,7 @@ func (r *Request) DelData(dataService *model.DataService) bool {
 		log.Println("Invalid request!")
 	}
 	r.Request.Header.Set("Content-Type", "application/json")
+	r.Request.Header.Set("Set-Cookie", model.GetCookie(dataService.ChatID))
 	resp.Response = r.doRequest()
 	if resp.Response.StatusCode == http.StatusOK {
 		return true
@@ -80,7 +83,7 @@ func (r *Request) SearchUser(chatID int64) bool {
 	)
 	dataService.ChatID = chatID
 	body := dataService.ToJSON()
-	r.Request, err = http.NewRequest("GET", "http://localhost:8080/api/v1/search", bytes.NewReader(body))
+	r.Request, err = http.NewRequest("GET", "http://localhost:8081/api/v1/search", bytes.NewReader(body))
 	if err != nil {
 		log.Println("Invalid request!")
 	}
@@ -101,13 +104,14 @@ func (r *Request) VerifyUser(chatID int64, text string) bool {
 	)
 	body := strconv.FormatInt(chatID, 10) + ":" + text
 	encoded = []byte(base64.StdEncoding.EncodeToString([]byte(body)))
-	r.Request, err = http.NewRequest("POST", "http://localhost:8080/api/v1/auth", bytes.NewReader([]byte("")))
+	r.Request, err = http.NewRequest("POST", "http://localhost:8081/api/v1/auth", bytes.NewReader([]byte("")))
 	if err != nil {
 		log.Println("Invalid request!")
 	}
 	r.Request.Header.Set("Authorization", "Basic "+string(encoded))
 	resp.Response = r.doRequest()
 	if resp.Response.StatusCode == http.StatusOK {
+		model.SetCookie(chatID, resp.Response.Header.Get("Set-Cookie"))
 		return true
 	} else {
 		return false
@@ -122,13 +126,14 @@ func (r *Request) SetUser(chatID int64, text string) bool {
 	)
 	body := strconv.FormatInt(chatID, 10) + ":" + text
 	encoded = []byte(base64.StdEncoding.EncodeToString([]byte(body)))
-	r.Request, err = http.NewRequest("POST", "http://localhost:8080/api/v1/set", bytes.NewReader([]byte("")))
+	r.Request, err = http.NewRequest("POST", "http://localhost:8081/api/v1/set", bytes.NewReader([]byte("")))
 	if err != nil {
 		log.Println("Invalid request!")
 	}
 	r.Request.Header.Set("Authorization", "Basic "+string(encoded))
 	resp.Response = r.doRequest()
 	if resp.Response.StatusCode == http.StatusOK {
+		model.SetCookie(chatID, resp.Response.Header.Get("Set-Cookie"))
 		return true
 	} else {
 		return false

@@ -20,3 +20,7 @@ func (resp *Response) SetStatusUnauthorized() {
 func (resp *Response) SetStatusBadRequest() {
 	resp.rw.WriteHeader(http.StatusBadRequest)
 }
+
+func (resp *Response) SetCookie(cookie string) {
+	resp.rw.Header().Set("Set-Cookie", cookie)
+}

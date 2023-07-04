@@ -15,9 +15,9 @@ var salt = "VX9XQ!psm7Qe#PbSC1#Cvup_4CI/TW7d"
 type Authentication struct {
 }
 
-func (auth *Authentication) VerificationPassword(data string) bool {
+func (auth *Authentication) VerificationPassword(data string) (string, bool) {
 	var (
-		db       database.Database
+		db       database.PostgresDB
 		chatID   string
 		password string
 	)
@@ -27,22 +27,22 @@ func (auth *Authentication) VerificationPassword(data string) bool {
 	tableData, err := db.Access.GetPwd(db.Pool, chatID)
 	if err != nil {
 		log.Printf("Don't found password for %s", chatID)
-		return false
+		return "", false
 	}
 
 	pwd := hex.EncodeToString(pbkdf2.Key([]byte(password), []byte(tableData.Salt), 10000, 32, sha1.New))
 	if tableData.Pwd == pwd {
 		log.Println("Password is corrected!")
-		return true
+		return chatID, true
 	} else {
 		log.Println("Password is uncorrected!")
-		return false
+		return "", false
 	}
 }
 
 func (auth *Authentication) SetPassword(data string) bool {
 	var (
-		db       database.Database
+		db       database.PostgresDB
 		chatID   string
 		password string
 	)
